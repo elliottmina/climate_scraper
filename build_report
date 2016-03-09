@@ -77,38 +77,3 @@ def write_report(template):
 
 if __name__ == "__main__":
 	main()
-
-
-# def main():
-# 	build_data_file()
-# 	build_location_file()
-# 	build_years()
-# 	build_config()
-
-# def build_data_file():
-# 	json_str = json.dumps(data_consolidator.build())
-# 	write_json('data', json_str)
-
-# def build_location_file():
-# 	json_str = json.dumps(LOCATIONS)
-# 	write_json('locations', json_str)
-
-# def build_years():
-# 	json_str = json.dumps({
-# 		'min':config.START_YEAR,
-# 		'max':datetime.today().year,
-# 	})
-# 	write_json('years', json_str)
-
-# def build_config():
-# 	json_str = json.dumps({
-#	'dayGranularity':config.REPORT_DAY_GRANULARITY})
-# 	write_json('config', json_str,)
-
-# def write_json(key, json_str, ):
-# 	path = '{}/{}.js'.format(config.REPORT_DIR, key)
-# 	with open(path, 'w') as file:
-# 		file.write('var {} = {};'.format(key, json_str))
-
-# if __name__ == "__main__":
-# 	main()
