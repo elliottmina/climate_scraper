@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Climate Comparator</title>
+
+		<script>
+			{inline_js_target}
+
+			var data = {data};
+			var locations = {locations};
+			var years = {years};
+			var config = {config};
+
+			$(document).ready(function() {
+				var colorProvider = new ColorProvider();
+				var dataReducer = new DataReducer({
+					data:data
+				});
+				var chartLabels = new ChartLabels({
+					config:config
+				});
+				var plotter = new Plotter({
+					colorProvider:colorProvider,
+					chartLabels:chartLabels,
+					chartFactories:{
+						snow: new ChartFactory({
+							canvas:$('#snow'),
+							chartLabels:chartLabels
+						}),
+						precip: new ChartFactory({
+							canvas:$('#precipitation'),
+							chartLabels:chartLabels
+						}),
+						temp: new ChartFactory({
+							canvas:$('#temperature'),
+							chartLabels:chartLabels,
+						})
+					}
+				});
+				var monitor = new Monitor({
+					dataReducer:dataReducer,
+					plotter:plotter
+				});
+				new Filter({
+					monitor:monitor,
+					locations:locations,
+					years:years,
+					colorProvider:colorProvider,
+					topContainer:$('#filter')
+				});
+			});
+		</script>
+		<style>
+		{inline_css_target}
+		</style>
+	</head>
+	<body>
+		<div id="filter">
+			<a href="javascript:void(0);" class="previous_year">&lt;</a>
+			<input type="number" name="year" />
+			<a href="javascript:void(0);" class="next_year">&gt;</a>
+			<ul class="locations"></ul>
+		</div>
+		<div class="chart">
+			<label>Temperature</label>
+			<canvas id="temperature" width="1350" height="600"></canvas>
+		</div>
+		<div class="chart">
+			<label>Precipitation</label>
+			<canvas id="precipitation" width="1350" height="400"></canvas>
+		</div>
+		<div class="chart">
+			<label>Snow</label>
+			<canvas id="snow" width="1350" height="400"></canvas>
+		</div>
+	</body>
+</html>

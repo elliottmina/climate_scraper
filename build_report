@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+import os
+import json
+from os.path import basename
+from glob import glob
+from subprocess import call
+from datetime import datetime
+from lib import config
+from lib import data_consolidator
+from lib.locations import LOCATIONS
+
+def main():
+	template = get_template()
+	template = add_data(template)
+	template = add_location_file(template)
+	template = add_years(template)
+	template = add_config(template)
+	template = inline_js(template)
+	template = inline_css(template)
+	write_report(template)
+
+def get_template():
+	with open(config.REPORT_DIR + '/report.html', 'r') as stream:
+		template = stream.read()
+	return template
+
+def add_data(template):
+	return template.replace(
+		'{data}', 
+		json.dumps(data_consolidator.build()))
+
+def add_location_file(template):
+	return template.replace(
+		'{locations}', 
+		json.dumps(LOCATIONS))
+
+def add_years(template):
+	return template.replace(
+		'{years}', 
+		json.dumps({
+			'min':config.START_YEAR,
+			'max':datetime.today().year,
+		}))
+
+def add_config(template):
+	return template.replace(
+		'{config}', 
+		json.dumps({
+			'dayGranularity':config.REPORT_DAY_GRANULARITY
+		}))
+
+def inline_js(template):
+	return inline(template, '{inline_js_target}', '.js')
+
+def inline_css(template):
+	return inline(template, '{inline_css_target}', '.css')
+
+def inline(template, target, extension):
+	for path in glob(config.REPORT_DIR + '/*' + extension):
+		with open(path, 'r') as stream:
+			template = template.replace(
+				target,
+				stream.read() + '\n' + target)
+	template = template.replace(target, '')
+	return template
+
+
+def write_report(template):
+	path = '{}/Report_{}.html'.format(
+		config.BASE_DIR, 
+		datetime.today().strftime('%Y-%m-%d'))
+	
+	with open(path, 'w') as stream:
+		stream.write(template)
+
+	call(['xdg-open', path]) 
+
+if __name__ == "__main__":
+	main()
+
+
+# def main():
+# 	build_data_file()
+# 	build_location_file()
+# 	build_years()
+# 	build_config()
+
+# def build_data_file():
+# 	json_str = json.dumps(data_consolidator.build())
+# 	write_json('data', json_str)
+
+# def build_location_file():
+# 	json_str = json.dumps(LOCATIONS)
+# 	write_json('locations', json_str)
+
+# def build_years():
+# 	json_str = json.dumps({
+# 		'min':config.START_YEAR,
+# 		'max':datetime.today().year,
+# 	})
+# 	write_json('years', json_str)
+
+# def build_config():
+# 	json_str = json.dumps({
+#	'dayGranularity':config.REPORT_DAY_GRANULARITY})
+# 	write_json('config', json_str,)
+
+# def write_json(key, json_str, ):
+# 	path = '{}/{}.js'.format(config.REPORT_DIR, key)
+# 	with open(path, 'w') as file:
+# 		file.write('var {} = {};'.format(key, json_str))
+
+# if __name__ == "__main__":
+# 	main()

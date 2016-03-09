@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+from lib import raw_collector
+from lib.locations import LOCATIONS
+
+for key in LOCATIONS.keys():
+	raw_collector.collect(key)

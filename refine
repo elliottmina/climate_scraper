@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+import os
+import json
+from lib import real_file_collector
+from lib import config
+from lib import payload_parser
+
+fails = []
+
+def main():
+	process_source_files()
+	output_fails()
+
+def process_source_files():
+	global fails
+
+	for raw_path in real_file_collector.collect(config.RAW_DIR):
+		try:
+			process_file(raw_path)
+		except Exception as e:
+			print(e)
+			fails.append(raw_path)
+
+def process_file(raw_path):
+	data_path = config.DATA_DIR + '/' + os.path.basename(raw_path)
+	if os.path.isfile(data_path):
+		return
+
+	print(raw_path)
+	data = payload_parser.parse(raw_path)
+
+	with open(data_path, 'w') as output_stream:
+		json.dump(data, output_stream)
+
+def output_fails():
+	if len(fails) > 0:
+		print('\n\nThe follow files failed')
+		for fail in fails:
+			print(fail)
+
+if __name__ == "__main__":
+	main()
